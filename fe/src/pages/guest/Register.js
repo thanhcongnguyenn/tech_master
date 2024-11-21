@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import './style/Login.css';
 import { useDispatch, useSelector } from 'react-redux';
 import {registerUser} from "../../redux/slices/authSlice";
-import bgImage from "../../assets/images/bg-login.jpg";
+import bgImage from "../../assets/images/bg-log-in.png";
 import toastr from 'toastr';
 import slideService from "../../api/slideService";
 
@@ -135,7 +135,7 @@ const Register = () => {
                                             </div>
                                             <div className="text-center d-flex justify-content-between mt-4"><p>Code
                                                 by <Link to={'/'}
-                                                         className="font-italic text-muted"><u>Phuphan</u></Link></p>
+                                                         className="font-italic text-muted"><u>TechH</u></Link></p>
                                             </div>
                                         </Form>
                                     )}

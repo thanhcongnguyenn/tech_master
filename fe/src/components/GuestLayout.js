@@ -53,7 +53,7 @@ const GuestLayout = () => {
             <Navbar bg="" variant="dark" style={{ backgroundColor: '#15397f' }}>
                 <Container>
                     <Navbar.Brand as={Link} to="/">
-                        <img src={'https://shop.30shine.com/images/Logo_30shine.svg'} alt="Logo" style={{ width: '80px' }} />
+                        <img src={''} alt="Logo" style={{ width: '80px' }} />
                     </Navbar.Brand>
                     <Nav className="me-auto">
                         <Nav.Link as={Link} to="/">Trang chủ</Nav.Link>

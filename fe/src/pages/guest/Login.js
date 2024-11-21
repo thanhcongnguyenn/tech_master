@@ -7,7 +7,7 @@ import './style/Login.css';
 import {loginUser, logout} from "../../redux/slices/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 import {unwrapResult} from "@reduxjs/toolkit";
-import bgImage from '../../assets/images/bg-login.jpg';
+import bgImage from '../../assets/images/bg-log-in.png';
 import toastr from 'toastr';
 import slideService from "../../api/slideService";
 
@@ -133,7 +133,7 @@ const Login = () => {
                                                 >Trang chủ</Link>
                                             </div>
                                             <div className="text-center d-flex justify-content-between mt-4">
-                                                <p>Code by <Link to={'/'} className="font-italic text-muted"><u>Phuphan</u></Link></p>
+                                                <p>Code by <Link to={'/'} className="font-italic text-muted"><u>TechH</u></Link></p>
                                             </div>
                                         </Form>
                                     )}
