@@ -40,8 +40,9 @@ const Profile = () => {
             setLoading(true);
             try {
                 const response = await apiUpload.uploadImage(file);
-                setAvatar(response.data);
-                setPreviewAvatar(response.data)
+                console.info("===========[] ===========[upload] : ",response);
+                setAvatar(response.data.secure_url);
+                setPreviewAvatar(response.data.secure_url)
             } catch (error) {
                 console.error("Error uploading image:", error);
             } finally {
@@ -53,7 +54,7 @@ const Profile = () => {
 
     const handleSaveChanges = async () => {
         const updatedData = {
-            name: user.name,
+            fullName: user.fullName,
             email: user.email,
             avatar: avatar || user.avatar,
             phone: user.phone
@@ -101,8 +102,8 @@ const Profile = () => {
                                     <Form.Label>Họ tên</Form.Label>
                                     <Form.Control
                                         type="text"
-                                        name="name"
-                                        value={user?.name}
+                                        name="fullName"
+                                        value={user?.fullName}
                                         onChange={handleInputChange}
                                     />
                                 </Form.Group>

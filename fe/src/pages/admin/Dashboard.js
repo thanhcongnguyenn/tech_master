@@ -3,7 +3,6 @@ import { Breadcrumb, Col, Container, Nav, Row, Card, Table } from "react-bootstr
 import { Link } from "react-router-dom";
 import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
-import serviceService from "../../api/serviceService";
 import dashboardService from "../../api/dashboardService";
 import {FaDatabase, FaPencilAlt, FaUser} from "react-icons/fa";
 import {FaCartShopping, FaPencil} from "react-icons/fa6";
@@ -59,25 +58,86 @@ const AdminDashboard = () => {
         }
     };
 
+    // const fetchMonthlyRevenue = async () => {
+    //     // Giả lập dữ liệu doanh thu theo tháng
+    //     try {
+    //         const response = await dashboardService.getFetchMonthlyRevenue({});
+    //         console.info("===========[getFetchMonthlyRevenue] ===========[] : ",response);
+    //         setMonthlyRevenueData(response.data);
+    //     } catch (error) {
+    //         console.error("Error fetching services:", error);
+    //     }
+    // };
+
     const fetchMonthlyRevenue = async () => {
-        // Giả lập dữ liệu doanh thu theo tháng
         try {
             const response = await dashboardService.getFetchMonthlyRevenue({});
-            console.info("===========[getFetchMonthlyRevenue] ===========[] : ",response);
-            setMonthlyRevenueData(response.data);
+            console.info("===========[getFetchMonthlyRevenue] ===========[] : ", response);
+
+            // Format dữ liệu từ API
+            const formattedData = {
+                labels: response.data.map((item) => item.date), // Trích xuất tháng
+                datasets: [
+                    {
+                        label: 'Doanh thu (Revenue)',
+                        data: response.data.map((item) => item.revenue), // Trích xuất doanh thu
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)', // Màu cột biểu đồ
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1,
+                    },
+                    {
+                        label: 'Chi tiêu (Expenditure)',
+                        data: response.data.map((item) => item.expenditure), // Trích xuất chi tiêu
+                        backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1,
+                    },
+                ],
+            };
+
+            // Cập nhật state với dữ liệu đã format
+            setMonthlyRevenueData(formattedData);
         } catch (error) {
-            console.error("Error fetching services:", error);
+            console.error("Error fetching monthly revenue:", error);
         }
     };
 
+
+
     const fetchDailyRevenue = async () => {
-        // Giả lập dữ liệu doanh thu theo ngày
         try {
-            const response = await dashboardService.getFetchDailyRevenue({});
-            console.info("===========[getFetchDailyRevenue] ===========[] : ",response);
-            setDailyRevenueData(response.data);
+            // Lấy ngày bắt đầu và ngày kết thúc của tháng hiện tại nếu không có tham số
+            const currentDate = new Date();
+            const startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).toISOString().split('T')[0];
+            const endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).toISOString().split('T')[0];
+
+            const params = {
+                startDate: startDate,
+                endDate: endDate
+            };
+
+            const response = await dashboardService.getFetchDailyRevenue(params);
+
+            console.info("===========[getFetchDailyRevenue] ===========[] : ", response);
+
+            // Format dữ liệu từ API để khớp với cấu trúc biểu đồ
+            const formattedData = {
+                labels: response.data.map((item) => item.date), // Trích xuất ngày
+                datasets: [
+                    {
+                        label: 'Doanh thu (Revenue)',
+                        data: response.data.map((item) => item.revenue), // Trích xuất doanh thu
+                        backgroundColor: 'rgba(75, 192, 192, 0.6)', // Màu cột
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            };
+
+            // Cập nhật state để hiển thị trên biểu đồ
+            setDailyRevenueData(formattedData);
         } catch (error) {
-            console.error("Error fetching services:", error);
+            console.error("Error fetching daily revenue:", error);
         }
     };
 

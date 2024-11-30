@@ -7,7 +7,7 @@ import './style/Login.css';
 import {loginUser, logout} from "../../redux/slices/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 import {unwrapResult} from "@reduxjs/toolkit";
-import bgImage from '../../assets/images/bg-log-in.png';
+import bgImage from '../../assets/images/bg-login.webp';
 import toastr from 'toastr';
 import slideService from "../../api/slideService";
 
@@ -123,14 +123,21 @@ const Login = () => {
                                                 >
                                                     <u>tại đây</u></Link>
                                                 </p>
-                                                <Link to={'/'} className="font-italic text-danger"
-                                                      onClick={(e) => {
-                                                          e.preventDefault();
-                                                          startTransition(() => {
-                                                              navigate("/");
-                                                          });
-                                                      }}
-                                                >Trang chủ</Link>
+                                                <p>
+                                                    Bạn quên mật khẩu{" "}
+                                                    <Link
+                                                        to={"/login"}
+                                                        className="font-italic text-muted"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            startTransition(() => {
+                                                                navigate("/forgot-password");
+                                                            });
+                                                        }}
+                                                    >
+                                                        <u>tại đây</u>
+                                                    </Link>
+                                                </p>
                                             </div>
                                             <div className="text-center d-flex justify-content-between mt-4">
                                                 <p>Code by <Link to={'/'} className="font-italic text-muted"><u>TechH</u></Link></p>

@@ -3,9 +3,8 @@ import {Container, Row, Col, ButtonGroup, Dropdown, Table, Pagination, Button} f
 import { useSearchParams } from "react-router-dom";
 import OrderBreadcrumbs from './components/order/OrderBreadcrumbs';
 import apiOrderService from "./../../api/apiOrderService";
-import {FaEdit, FaListUl, FaPlusCircle, FaTrash} from "react-icons/fa";
+import {FaCoins, FaHandshake, FaTrash} from "react-icons/fa";
 import OrderDetailsModal from './components/order/OrderDetailsModal';
-import NewOrderModal from "../admin/components/order/NewOrderModal";
 import ModelConfirmDeleteData from "../components/model-delete/ModelConfirmDeleteData";
 
 const formatCurrency = (value) => {
@@ -22,17 +21,32 @@ const OrderManager = () => {
     const [orderToUpdate, setOrderToUpdate] = useState(null); // State quản lý đơn hàng để cập nhật
     const [searchParams, setSearchParams] = useSearchParams();
     const [orderDetails , setOrderDetails] = useState([]);
+    const [selectedStatus, setSelectedStatus] = useState(null);
 
     // Hàm để gọi lại API và tải danh sách đơn hàng mới nhất
     const refreshOrders = async () => {
         const params = Object.fromEntries([...searchParams]);
-        await fetchOrdersWithParams({ ...params, page: params.page || 0, page_size: params.page_size || 10 });
+        await fetchOrdersWithParams({
+            ...params,
+            page: params.page || 0,
+            page_size: params.page_size || 10,
+            status: selectedStatus || '',
+        });
+    };
+
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleStatusChange = (status) => {
+        setSelectedStatus(status);
+        setSearchParams({ ...Object.fromEntries([...searchParams]), status, page: 0 }); // Reset về trang 1
     };
 
     const fetchOrdersWithParams = async (params) => {
         try {
-            const response = await apiOrderService.getLists(params);
-            console.info("===========[] ===========[response] : ",response);
+            const response = await apiOrderService.getLists({
+                ...params,
+                status: params.status || selectedStatus || '',
+            });
             setOrders(response.data.data);
             setMeta(response.data.meta);
         } catch (error) {
@@ -67,16 +81,35 @@ const OrderManager = () => {
             console.error("Error deleting order:", error);
         }
     };
+     const handleFaHandshakeData = async (order) => {
+            try {
+                await apiOrderService.handleFaHandshakeData(order.id);
+                await refreshOrders();
+                setShowDeleteModal(false);
+            } catch (error) {
+                console.error("Error deleting order:", error);
+            }
+        };
 
     const handlePageChange = (newPage) => {
         setSearchParams({ page: newPage });
     };
 
-    const handleUpdateOrderClick = (order) => {
-        if (order.status !== 'completed') {
-            setOrderToUpdate(order); // Mở modal ở chế độ cập nhật với order được chọn
-        } else {
-            alert("Không thể chỉnh sửa đơn hàng đã hoàn tất.");
+    const handlePayLaterData = async (order) => {
+        console.info("===========[] ===========[] : ",);
+        setIsLoading(true); // Bắt đầu loading
+        try {
+            const response = await apiOrderService.addPayLater(order.id);
+            if (response.status === 'success') {
+                setIsLoading(false);
+                window.open(response.data.urlVnpay, '_blank', 'noopener,noreferrer');
+            }
+            console.info("===========[] ===========[response] : ", response);
+        } catch (error) {
+            console.error("Error processing Pay Later:", error);
+            alert("Đã xảy ra lỗi trong quá trình xử lý!");
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -84,12 +117,14 @@ const OrderManager = () => {
         switch (status) {
             case 'PENDING':
                 return 'primary';
-            case 'completed':
+            case 'CONFIRMED':
                 return 'success';
-            case 'CANCELLED':
-                return 'danger';
-            default:
+            case 'SHIPPED':
+                return 'info';
+            case 'DELIVERED':
                 return 'secondary';
+            default:
+                return 'danger';
         }
     };
 
@@ -104,9 +139,19 @@ const OrderManager = () => {
                 <Col>
                     <div className="d-flex justify-content-between align-items-center mb-3">
                         <h2>Quản lý đơn hàng</h2>
-                        {/*<Button size="sm" variant="primary" onClick={() => setOrderToUpdate({})}>*/}
-                        {/*    Thêm mới <FaPlusCircle className="mx-1" />*/}
-                        {/*</Button>*/}
+                        <Dropdown onSelect={handleStatusChange}>
+                            <Dropdown.Toggle variant="secondary" id="status-dropdown">
+                                {selectedStatus || "Lọc theo trạng thái"}
+                            </Dropdown.Toggle>
+                            <Dropdown.Menu>
+                                <Dropdown.Item eventKey="PENDING">PENDING</Dropdown.Item>
+                                <Dropdown.Item eventKey="CONFIRMED">CONFIRMED</Dropdown.Item>
+                                <Dropdown.Item eventKey="SHIPPED">SHIPPED</Dropdown.Item>
+                                <Dropdown.Item eventKey="DELIVERED">DELIVERED</Dropdown.Item>
+                                <Dropdown.Item eventKey="CANCELLED">CANCELLED</Dropdown.Item>
+                                <Dropdown.Item eventKey="">Tất cả</Dropdown.Item>
+                            </Dropdown.Menu>
+                        </Dropdown>
                     </div>
                     <Table striped bordered hover>
                         <thead>
@@ -114,6 +159,7 @@ const OrderManager = () => {
                             <th>Mã ĐH</th>
                             <th>Địa chỉ</th>
                             <th>Tổng tiền</th>
+                            <th>PT Thanh toán</th>
                             <th>Trạng thái</th>
                             <th>Thao tác</th>
                         </tr>
@@ -124,6 +170,7 @@ const OrderManager = () => {
                                 <td onClick={() => handleOrderClick(order)}>{order.id}</td>
                                 <td onClick={() => handleOrderClick(order)}>{order.deliveryInfo}</td>
                                 <td onClick={() => handleOrderClick(order)}>{formatCurrency(order.totalAmount)}</td>
+                                <td onClick={() => handleOrderClick(order)}>{order?.paymentMethod || "COD"}</td>
                                 <td onClick={() => handleOrderClick(order)}>
                                     <span className={`text-${getVariant(order.status)}`}>{order.status}</span>
                                 </td>
@@ -137,14 +184,39 @@ const OrderManager = () => {
                                     {/*    <FaEdit />*/}
                                     {/*</Button>*/}
                                     {order.status === "PENDING" &&  (
+                                        <>
+                                            <Button
+                                                style={{ padding: '2px', fontSize: '10px'}}
+                                                size="sm"
+                                                className="ms-2"
+                                                variant="danger"
+                                                onClick={() => handleDeleteData(order)}
+                                                title="Huỷ đơn"
+                                            >
+                                                <FaTrash /> Huỷ đơn
+                                            </Button>
+                                            <Button
+                                                style={{ padding: '2px', fontSize: '10px'}}
+                                                size="sm"
+                                                className="ms-2"
+                                                variant="success"
+                                                onClick={() => handleFaHandshakeData(order)}
+                                                title="Đã nhận hàng"
+                                            >
+                                                <FaHandshake /> Đã nhận hàng
+                                            </Button>
+                                        </>
+                                    )}
+                                    {order.totalAmount > order.amountPaid && order?.paymentMethod == "PAY_LATER" && (
                                         <Button
+                                            style={{ padding: '2px', fontSize: '10px'}}
                                             size="sm"
                                             className="ms-2"
-                                            variant="danger"
-                                            onClick={() => handleDeleteData(order)}
-                                            title="Huỷ đơn"
+                                            variant="primary"
+                                            onClick={() => handlePayLaterData(order)}
+                                            title="Trả góp"
                                         >
-                                            <FaTrash />
+                                            <FaCoins /> Trả góp
                                         </Button>
                                     )}
                                 </td>
@@ -161,7 +233,7 @@ const OrderManager = () => {
                             onClick={() => handlePageChange(meta.page - 1)}
                             disabled={meta.page === 1}
                         />
-                        {Array.from({ length: meta.total_page }, (_, index) => (
+                        {Array.from({ length: meta.totalPage }, (_, index) => (
                             <Pagination.Item
                                 key={index + 1}
                                 active={index + 1 === meta.page}
@@ -172,11 +244,11 @@ const OrderManager = () => {
                         ))}
                         <Pagination.Next
                             onClick={() => handlePageChange(meta.page + 1)}
-                            disabled={meta.page === meta.total_page}
+                            disabled={meta.page === meta.totalPage}
                         />
                         <Pagination.Last
-                            onClick={() => handlePageChange(meta.total_page)}
-                            disabled={meta.page === meta.total_page}
+                            onClick={() => handlePageChange(meta.totalPage)}
+                            disabled={meta.page === meta.totalPage}
                         />
                     </Pagination>
                 </Col>
@@ -189,18 +261,39 @@ const OrderManager = () => {
                 order={selectedOrder}
             />
 
-            <NewOrderModal
-                show={!!orderToUpdate}
-                onHide={() => setOrderToUpdate(null)}
-                orderToUpdate={orderToUpdate}
-                refreshOrders={refreshOrders} // Truyền hàm callback để làm mới danh sách đơn hàng
-            />
+            {/*<NewOrderModal*/}
+            {/*    show={!!orderToUpdate}*/}
+            {/*    onHide={() => setOrderToUpdate(null)}*/}
+            {/*    orderToUpdate={orderToUpdate}*/}
+            {/*    refreshOrders={refreshOrders} // Truyền hàm callback để làm mới danh sách đơn hàng*/}
+            {/*/>*/}
 
             <ModelConfirmDeleteData
                 showDeleteModal={showDeleteModal}
                 setShowDeleteModal={setShowDeleteModal}
                 handleDeleteData={handleDeleteData}
             />
+            {isLoading && (
+                <div
+                    style={{
+                        position: "fixed",
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        height: "100%",
+                        backgroundColor: "rgba(0, 0, 0, 0.5)",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        zIndex: 9999,
+                    }}
+                >
+                    <div className="spinner-border text-light" role="status">
+                        <span className="visually-hidden">Đang xử lý...</span>
+                    </div>
+                </div>
+            )}
+
         </Container>
     );
 };

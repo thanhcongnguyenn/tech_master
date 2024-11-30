@@ -5,7 +5,7 @@ const formatCurrency = (value) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
 };
 
-const OrderDetailsModal = ({ show, onHide, order }) => {
+const OrderDetailsModal = ({ show, orderDetails, onHide, order }) => {
     return (
         <Modal show={show} onHide={onHide} size="lg">
             <Modal.Header closeButton>
@@ -25,10 +25,10 @@ const OrderDetailsModal = ({ show, onHide, order }) => {
                     </tr>
                     </thead>
                     <tbody>
-                    {order?.transactions?.map((transaction, idx) => (
-                        <tr key={transaction._id}>
+                    {orderDetails?.map((transaction, idx) => (
+                        <tr key={transaction.id}>
                             <td>{idx + 1}</td>
-                            <td>{transaction.product?.name}</td>
+                            <td>{transaction.productName}</td>
                             <td>{transaction.quantity}</td>
                             <td>{formatCurrency(transaction.price)}</td>
                             <td>{formatCurrency(transaction.price * transaction.quantity)}</td>

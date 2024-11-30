@@ -23,17 +23,6 @@ const AdminLayout = ({ isAuthenticated, user, onLogout }) => {
                 <Container>
                     <Navbar.Brand as={Link} to="/admin">ADMIN</Navbar.Brand>
                     <Nav className="me-auto">
-                        {/*<Nav.Link as={Link} to="/admin/user">Tài khoản</Nav.Link>*/}
-                        {/*<Dropdown as={Nav.Item}>*/}
-                        {/*    <Dropdown.Toggle as={Nav.Link} id="dropdown-news">*/}
-                        {/*        Tin tức*/}
-                        {/*    </Dropdown.Toggle>*/}
-                        {/*    <Dropdown.Menu>*/}
-                        {/*        <Dropdown.Item as={Link} to="/admin/news/menus">Chuyên mục</Dropdown.Item>*/}
-                        {/*        <Dropdown.Item as={Link} to="/admin/news/tags">Từ khoá</Dropdown.Item>*/}
-                        {/*        <Dropdown.Item as={Link} to="/admin/news/articles">Bài viết</Dropdown.Item>*/}
-                        {/*    </Dropdown.Menu>*/}
-                        {/*</Dropdown>*/}
                         <Dropdown as={Nav.Item}>
                             <Dropdown.Toggle as={Nav.Link} id="dropdown-ecm">
                                 Bán hàng
@@ -41,9 +30,9 @@ const AdminLayout = ({ isAuthenticated, user, onLogout }) => {
                             <Dropdown.Menu>
                                 <Dropdown.Item as={Link} to="/admin/ecommerce/brand">Thương hiệu</Dropdown.Item>
                                 <Dropdown.Item as={Link} to="/admin/ecommerce/categories">Danh mục</Dropdown.Item>
-                                {/*<Dropdown.Item as={Link} to="/admin/ecommerce/product-labels">Nhãn sản phẩm</Dropdown.Item>*/}
-                                {/*<Dropdown.Item as={Link} to="/admin/ecommerce/product">Sản phẩm</Dropdown.Item>*/}
-                                {/*<Dropdown.Item as={Link} to="/admin/ecommerce/order">Đơn hàng</Dropdown.Item>*/}
+                                <Dropdown.Item as={Link} to="/admin/ecommerce/voucher">Voucher</Dropdown.Item>
+                                <Dropdown.Item as={Link} to="/admin/ecommerce/product">Sản phẩm</Dropdown.Item>
+                                <Dropdown.Item as={Link} to="/admin/ecommerce/order">Đơn hàng</Dropdown.Item>
                             </Dropdown.Menu>
                         </Dropdown>
                         <Dropdown as={Nav.Item}>

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, {useState, useEffect, startTransition} from 'react';
+import {Link, useNavigate} from 'react-router-dom';
 import { Container, Row, Col, Button, Table, Form, Modal } from 'react-bootstrap';
 import {addToCart, setAllCart} from "../../redux/slices/cartSlice";
 import {useDispatch, useSelector} from "react-redux";
@@ -7,6 +7,7 @@ import apiOrderService from "../../api/apiOrderService";
 import toastr from "toastr";
 import Select from 'react-select';
 import apiAddressService from "../../api/apiAddressService";
+import {FaCheckCircle, FaHome} from "react-icons/fa";
 
 const Cart = () => {
     const [cartItems, setCartItems] = useState([]);
@@ -19,12 +20,6 @@ const Cart = () => {
     const user = useSelector((state) => state.auth.user);
 
     const dispatch = useDispatch();
-    // Khởi tạo `userInfo` với thông tin user nếu đã đăng nhập
-    const [userInfo, setUserInfo] = useState({
-        name: user?.name || '',
-        phone: user?.phone || '',
-        address: user?.address || ''
-    });
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -92,16 +87,11 @@ const Cart = () => {
         }
     };
 
-    const handleCheckout = () => {
-        setShowCheckout(true);
-    };
 
-    const handleUserInfoChange = (e) => {
-        const { name, value } = e.target;
-        setUserInfo((prevInfo) => ({
-            ...prevInfo,
-            [name]: value
-        }));
+    const handleCheckout = () => {
+        startTransition(() => {
+            navigate("/checkout");
+        });
     };
 
     const handleConfirmPayment = async () => {
@@ -185,10 +175,27 @@ const Cart = () => {
             <h4 className="text-end">Tổng tiền: {cartItems.totalAmount?.toLocaleString('vi-VN')} vnđ</h4>
             <h5 className="text-end">Số lượng sản phẩm: {cartItems.data?.length}</h5> {/* Hiển thị itemCount */}
             <div className="d-flex justify-content-between mt-3">
-                <Button variant="primary">Tiếp tục mua sắm</Button>
-                {cartItems.data?.length > 0 && (
-                    <Button variant="danger" onClick={handleCheckout}>Thanh toán</Button>
-                )}
+                <Link className="text-white btn btn-danger text-decoration-none"
+                      onClick={(e) => {
+                          e.preventDefault();
+                          startTransition(() => {
+                              navigate("/");
+                          });
+                      }}
+                      to={'/'}>
+                    <FaHome className="me-2" />
+                    Tiếp tục mua sắm
+                </Link>
+
+                <Button variant="primary" onClick={handleCheckout}>
+                    <FaCheckCircle className="me-2" />
+                    Thanh toán
+                </Button>
+
+                {/*<Button variant="danger" onClick={handleCheckout}>Thanh toán</Button>*/}
+                {/*{cartItems.data?.length > 0 && (*/}
+                {/*  */}
+                {/*)}*/}
             </div>
 
             {/* Modal để nhập thông tin thanh toán */}

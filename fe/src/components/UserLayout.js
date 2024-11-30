@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import React, { startTransition } from 'react';
 import { Container, Nav, Dropdown, Navbar } from 'react-bootstrap';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
-import { FaBars, FaTimes, FaBox, FaPaw, FaShoppingCart, FaShareAlt, FaClipboardList } from 'react-icons/fa'; // Thêm icon từ react-icons
 import './UserLayout.css'; // CSS tùy chỉnh
 import { logout } from "../redux/slices/authSlice";
 import { useDispatch } from "react-redux";
@@ -12,7 +11,9 @@ const UserLayout = ({ isAuthenticated, user }) => {
     const navigate = useNavigate();
     const handleLogout = () => {
         dispatch(logout()); // Dispatch action logout để đăng xuất người dùng
-        navigate('/login');
+        startTransition(() => {
+            navigate("/login");
+        });
     };
     console.info("===========[] ===========[OK VAO DAY] : ");
 
@@ -24,6 +25,7 @@ const UserLayout = ({ isAuthenticated, user }) => {
                     <Nav className="me-auto">
                         <Nav.Link as={Link} to="/user/orders">Đơn hàng</Nav.Link>
                         <Nav.Link as={Link} to="/user/address">Địa chỉ</Nav.Link>
+                        <Nav.Link as={Link} to="/user/update-password">Cập nhật mật khẩu</Nav.Link>
                     </Nav>
                     <Nav>
                         <Dropdown align="end">

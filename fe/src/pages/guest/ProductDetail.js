@@ -9,19 +9,24 @@ import {createSlug, formatPrice} from '../../helpers/formatters';
 import './style/ProductDetail.css';
 import apiOrderService from "../../api/apiOrderService";
 import toastr from 'toastr';
+import apiVoteService from "../../api/apiVoteService";
+import ProductReviews from "../components/product/ProductReviews";
 
 const ProductDetail = () => {
     const { slug } = useParams();
     const [product, setProduct] = useState(null);
     const [quantity, setQuantity] = useState(1);
+    const [productID, setProductId] = useState(null);
     const [selectedImage, setSelectedImage] = useState(0);
     const [relatedProducts, setRelatedProducts] = useState([]);
+    const [votes, setVotes] = useState([]);
     const dispatch = useDispatch();
 
     useEffect(() => {
         const fetchProduct = async () => {
             if (slug) {
                 const id = slug.split('-').pop();
+                setProductId(id);
                 try {
                     const response = await apiProductService.showProductDetail(id);
                     setProduct(response.data);
@@ -38,8 +43,22 @@ const ProductDetail = () => {
             });
             setRelatedProducts(productsResponse.data.data);
         };
+        const getListsVote = async () => {
+            if (slug) {
+                const id = slug.split('-').pop();
+                const votesResponse = await apiVoteService.getListsVoteProducts(id, {
+                    page: 0,
+                    page_size: 10
+                });
+                setVotes(votesResponse.data);
+                console.info("===========[] ===========[votesResponse] : ",votesResponse);
+            }
+        };
+
+
         fetchProduct().then(r => {});
-        getProducts().then(r => {})
+        getProducts().then(r => {});
+        getListsVote().then(r => {});
     }, [slug]);
     console.info("===========[] ===========[] : ",slug);
     if (!product) {
@@ -221,6 +240,9 @@ const ProductDetail = () => {
                         </div>
                         {renderRatingFilters()}
                     </div>
+                </Col>
+                <Col lg={8}>
+                    <ProductReviews productId={productID} />
                 </Col>
             </Row>
 

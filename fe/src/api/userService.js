@@ -18,10 +18,22 @@ const userService = {
         return apiHelper.delete(`admin/users/${id}`);
     },
     getProfile: (id) => {
-        return apiHelper.get(`me`);
+        return apiHelper.get(`myInfo`);
     },
     updateProfile: (data) => {
         return apiHelper.put(`me`,data);
+    },
+    activeAccount: (data) => {
+        return apiHelper.post(`auth/active`,data);
+    },
+    forgotPassword: (data) => {
+        return apiHelper.post(`forgotPassword`,data);
+    },
+    updatePassword: (data) => {
+        return apiHelper.post(`user/changePassword`,data);
+    },
+    resetPassword: (data) => {
+        return apiHelper.post(`resetPassword`,data);
     },
 };
 

@@ -9,6 +9,7 @@ import BoardingManager from "../pages/user/BoardingManager";
 import OrderManager from "../pages/user/OrderManager";
 import ProductManager from "../pages/user/ProductManager";
 import AddressManager from "../pages/user/AddressManager";
+import UpdatePassword from "../pages/user/UpdatePassword";
 
 const UserRoutes = () => {
     const { user, isAuthenticated } = useSelector((state) => state.auth);
@@ -27,6 +28,7 @@ const UserRoutes = () => {
                 <Route path="orders" element={<OrderManager />} />
                 <Route path="boarding" element={<BoardingManager />} />
                 <Route path="products" element={<ProductManager />} />
+                <Route path="update-password" element={<UpdatePassword />} />
             </Route>
         </Routes>
     );

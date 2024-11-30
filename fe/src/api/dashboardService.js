@@ -7,11 +7,10 @@ const dashboardService = {
     },
     getFetchMonthlyRevenue: (params) => {
         const paramsSearch = new URLSearchParams(params);
-        return apiHelper.get(`admin/dashboard/fetch-monthly-revenue?${paramsSearch.toString()}`);
+        return apiHelper.get(`admin/order/getMonthlyRevenue/2024?${paramsSearch.toString()}`);
     },
-    getFetchDailyRevenue: (params) => {
-        const paramsSearch = new URLSearchParams(params);
-        return apiHelper.get(`admin/dashboard/fetch-daily-revenue?${paramsSearch.toString()}`);
+    getFetchDailyRevenue: (data) => {
+        return apiHelper.post(`admin/order/getDailyRevenue`,data);
     },
     getFetchNewOrder: (params) => {
         const paramsSearch = new URLSearchParams(params);

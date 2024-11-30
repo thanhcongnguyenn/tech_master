@@ -12,7 +12,7 @@ const apiOrderService = {
     },
     getListsAdmin: (params) => {
         const paramsSearch = new URLSearchParams(params);
-        return apiHelper.get(`admin/order?${paramsSearch.toString()}`);
+        return apiHelper.get(`admin/order/listOrder?${paramsSearch.toString()}`);
     },
     getLists: (params) => {
         const paramsSearch = new URLSearchParams(params);
@@ -24,8 +24,17 @@ const apiOrderService = {
     delete: (id) => {
         return apiHelper.delete(`admin/order/${id}`);
     },
+    handleConfirmData: (id) => {
+        return apiHelper.get(`admin/order/confirmedOrder/${id}`);
+    },
+    handleShipperOrderData: (id) => {
+        return apiHelper.get(`admin/order/shipperOrder/${id}`);
+    },
     updateOrderStatus: (id) => {
         return apiHelper.get(`client/order/cancelOrder/${id}`);
+    },
+    handleFaHandshakeData: (id) => {
+        return apiHelper.get(`client/order/deliverdOrder/${id}`);
     },
     showDetail: (id) => {
         return apiHelper.get(`client/order/orderDetail/${id}`);
@@ -41,6 +50,9 @@ const apiOrderService = {
     },
     removeCartItem: (id) => {
         return apiHelper.post(`client/cartItem/deletedById/${id}`);
+    },
+    addPayLater: (id) => {
+        return apiHelper.post(`client/order/payLater/${id}`);
     }
 };
 

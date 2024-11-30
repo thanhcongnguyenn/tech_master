@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import './style/Login.css';
 import { useDispatch, useSelector } from 'react-redux';
 import {registerUser} from "../../redux/slices/authSlice";
-import bgImage from "../../assets/images/bg-log-in.png";
+import bgImage from "../../assets/images/bg-login.webp";
 import toastr from 'toastr';
 import slideService from "../../api/slideService";
 
@@ -16,8 +16,6 @@ const Register = () => {
         email: '',
         userName: '',
         password: '',
-        confirmPassword: '',
-        role: 'customer'
     };
     const dispatch = useDispatch();
     const { loading, error } = useSelector((state) => state.auth);
@@ -38,16 +36,14 @@ const Register = () => {
             .matches(/[A-Z]/, 'Password must contain at least one uppercase letter')  // Kiểm tra có ít nhất 1 chữ in hoa
             .matches(/\d/, 'Password must contain at least one number')              // Kiểm tra có ít nhất 1 số
             .required('Required'),
-        confirmPassword: Yup.string()
-            .oneOf([Yup.ref('password'), null], 'Passwords must match')
-            .required('Required')
     });
 
     const onSubmit = async (values, { setSubmitting, setErrors }) => {
+        console.info("===========[] ===========[values] : ",values);
         const result = await dispatch(registerUser(values));
         if (registerUser.fulfilled.match(result)) {
-            toastr.success('Đăng ký thành công, xin vui lòng đăng nhập hệ thống', 'Success');
-            navigate('/login');
+            toastr.success('Đăng ký thành công, xin vui lòng kiểm tra email để kích hoạt tài khoản', 'Success');
+            navigate('/active/account');
         } else {
             setErrors({ submit: "Đăng ký thất bại, vui lòng thử lại." });
             toastr.error('Đăng ký thất bại, thông tin đăng ký không hợp lệ', 'Error');
@@ -103,12 +99,6 @@ const Register = () => {
                                                 <Field name="password" type="password" className="form-control"/>
                                                 <ErrorMessage name="password" component="div" className="text-danger"/>
                                             </div>
-                                            <div className="mb-3">
-                                                <label htmlFor="confirmPassword">Confirm Password</label>
-                                                <Field name="confirmPassword" type="password" className="form-control"/>
-                                                <ErrorMessage name="confirmPassword" component="div"
-                                                              className="text-danger"/>
-                                            </div>
                                             <Button type="submit" className="w-100" disabled={isSubmitting}>
                                                 Register
                                             </Button>
@@ -125,13 +115,21 @@ const Register = () => {
                                                 >
                                                     <u>tại đây</u></Link>
                                                 </p>
-                                                <Link to={'/'}  onClick={(e) => {
-                                                    e.preventDefault();
-                                                    startTransition(() => {
-                                                        navigate("/");
-                                                    });
-                                                }}
-                                                      className="font-italic text-danger">Trang chủ</Link>
+                                                <p>
+                                                    Bạn quên mật khẩu{" "}
+                                                    <Link
+                                                        to={"/login"}
+                                                        className="font-italic text-muted"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            startTransition(() => {
+                                                                navigate("/forgot-password");
+                                                            });
+                                                        }}
+                                                    >
+                                                        <u>tại đây</u>
+                                                    </Link>
+                                                </p>
                                             </div>
                                             <div className="text-center d-flex justify-content-between mt-4"><p>Code
                                                 by <Link to={'/'}

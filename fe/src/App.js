@@ -16,6 +16,13 @@ import { loadUserFromLocalStorage } from "./redux/slices/authSlice";
 // Import các route đã tách
 import AdminRoutes from './routes/AdminRoutes';
 import UserRoutes from './routes/UserRoutes';
+import Verify from "./pages/guest/Verify";
+import AuthLayout from "./components/AuthLayout";
+import ActiveAccount from "./pages/guest/ActiveAccount";
+import ForgotPassword from "./pages/guest/ForgotPassword";
+import ResetPassword from "./pages/guest/ResetPassword";
+import Checkout from "./pages/guest/Checkout";
+import EmptyLayout from "./components/EmptyLayout";
 
 
 const LoginLayout = React.lazy(() => import('./components/LoginLayout'));
@@ -74,12 +81,28 @@ const App = () => {
                 {/* Sử dụng UserRoutes */}
                 <Route path="/user/*" element={<UserRoutes />} />
 
+                <Route path="/checkout/*" element={<EmptyLayout />}>
+                    <Route index element={<Checkout />} />
+                </Route>
+
                 {/* Routes dành cho login và register */}
                 <Route path="login" element={<LoginLayout />}>
                     <Route index element={<Login />} />
                 </Route>
                 <Route path="register" element={<RegisterLayout />}>
                     <Route index element={<Register />} />
+                </Route>
+                <Route path="/verify/:token" element={<AuthLayout />}>
+                    <Route index element={<Verify />} />
+                </Route>
+                <Route path="/active/account" element={<AuthLayout />}>
+                    <Route index element={<ActiveAccount />} />
+                </Route>
+                <Route path="forgot-password" element={<AuthLayout />}>
+                    <Route index element={<ForgotPassword />} />
+                </Route>
+                <Route path="/reset-password" element={<AuthLayout />}>
+                    <Route index element={<ResetPassword />} />
                 </Route>
 
                 {/* Điều hướng đến trang chủ nếu không tìm thấy route */}

@@ -3,7 +3,7 @@ import { Container, Row, Col, Button, Table, Pagination } from 'react-bootstrap'
 import { useSearchParams } from "react-router-dom";
 import OrderBreadcrumbs from '../components/order/OrderBreadcrumbs';
 import apiOrderService from "../../../api/apiOrderService";
-import { FaEdit, FaPlusCircle, FaTrash } from "react-icons/fa";
+import {FaEdit, FaHandshake, FaPlusCircle, FaTrash} from "react-icons/fa";
 import OrderDetailsModal from '../components/order/OrderDetailsModal';
 import ModelConfirmDeleteData from "../../components/model-delete/ModelConfirmDeleteData";
 import NewOrderModal from '../components/order/NewOrderModal';
@@ -21,11 +21,12 @@ const OrderManager = () => {
     const [showOrderModal, setShowOrderModal] = useState(false);
     const [orderToUpdate, setOrderToUpdate] = useState(null); // State quản lý đơn hàng để cập nhật
     const [searchParams, setSearchParams] = useSearchParams();
+    const [orderDetails , setOrderDetails] = useState([]);
 
     // Hàm để gọi lại API và tải danh sách đơn hàng mới nhất
     const refreshOrders = async () => {
         const params = Object.fromEntries([...searchParams]);
-        await fetchOrdersWithParams({ ...params, page: params.page || 1, page_size: params.page_size || 10 });
+        await fetchOrdersWithParams({ ...params, page: params.page || 0, page_size: params.page_size || 10 });
     };
 
     const fetchOrdersWithParams = async (params) => {
@@ -42,7 +43,11 @@ const OrderManager = () => {
         refreshOrders();
     }, [searchParams]);
 
-    const handleOrderClick = (order) => {
+    const handleOrderClick = async (order) => {
+        const response = await apiOrderService.showDetail(order.id);
+        setOrderDetails(response.data);
+        setSelectedOrder(order);
+
         setSelectedOrder(order);
         setShowOrderModal(true);
     };
@@ -52,6 +57,23 @@ const OrderManager = () => {
             await apiOrderService.delete(orderToDelete.id);
             await refreshOrders();
             setShowDeleteModal(false);
+        } catch (error) {
+            console.error("Error deleting order:", error);
+        }
+    };
+
+    const handleConfirmData = async (order) => {
+        try {
+            await apiOrderService.handleConfirmData(order.id);
+            await refreshOrders();
+        } catch (error) {
+            console.error("Error deleting order:", error);
+        }
+    };
+    const handleShipperOrderData = async (order) => {
+        try {
+            await apiOrderService.handleShipperOrderData(order.id);
+            await refreshOrders();
         } catch (error) {
             console.error("Error deleting order:", error);
         }
@@ -100,10 +122,8 @@ const OrderManager = () => {
                     <Table striped bordered hover>
                         <thead>
                         <tr>
-                            <th>#</th>
                             <th>Mã ĐH</th>
-                            <th>Khách hàng</th>
-                            <th>SĐT</th>
+                            <th>Địa chỉ</th>
                             <th>Tổng tiền</th>
                             <th>Trạng thái</th>
                             <th>Thao tác</th>
@@ -111,36 +131,52 @@ const OrderManager = () => {
                         </thead>
                         <tbody>
                         {orders.map((order, idx) => (
-                            <tr key={order.id} style={{ cursor: 'pointer' }}>
-                                <td onClick={() => handleOrderClick(order)}>{idx + 1}</td>
-                                <td onClick={() => handleOrderClick(order)}>{order.code}</td>
-                                <td onClick={() => handleOrderClick(order)}>{order.user?.name}</td>
-                                <td onClick={() => handleOrderClick(order)}>{order.user?.phone}</td>
-                                <td onClick={() => handleOrderClick(order)}>{formatCurrency(order.sub_total)}</td>
+                            <tr key={order.id} style={{cursor: 'pointer'}}>
+                                <td onClick={() => handleOrderClick(order)}>{order.id}</td>
+                                <td onClick={() => handleOrderClick(order)}>{order.deliveryInfo}</td>
+                                <td onClick={() => handleOrderClick(order)}>{formatCurrency(order.totalAmount)}</td>
                                 <td onClick={() => handleOrderClick(order)}>
                                     <span className={`text-${getVariant(order.status)}`}>{order.status}</span>
                                 </td>
                                 <td>
-                                    <Button
-                                        size="sm"
-                                        variant="primary"
-                                        onClick={() => handleUpdateOrderClick(order)}
-                                        title="Cập nhật"
-                                    >
-                                        <FaEdit />
-                                    </Button>
-                                    <Button
-                                        size="sm"
-                                        className="ms-2"
-                                        variant="danger"
-                                        onClick={() => {
-                                            setOrderToDelete(order);
-                                            setShowDeleteModal(true);
-                                        }}
-                                        title="Xoá"
-                                    >
-                                        <FaTrash />
-                                    </Button>
+                                    {order.status === "PENDING" && (
+                                        <>
+                                            <Button
+                                                size="sm"
+                                                className="ms-2"
+                                                variant="danger"
+                                                onClick={() => handleDeleteData(order)}
+                                                title="Huỷ đơn"
+                                                style={{ padding: '2px', fontSize: '10px'}}
+                                            >
+                                                <FaTrash/> Huỷ đơn
+                                            </Button>
+                                            <Button
+                                                style={{ padding: '2px', fontSize: '10px'}}
+                                                size="sm"
+                                                className="ms-2"
+                                                variant="success"
+                                                onClick={() => handleConfirmData(order)}
+                                                title="Xác nhận đơn"
+                                            >
+                                                <FaHandshake/> Xác nhận đơn
+                                            </Button>
+                                        </>
+                                    )}
+                                    {order.status === "CANCELLED" && (
+                                        <>
+                                            <Button
+                                                style={{ padding: '2px', fontSize: '10px'}}
+                                                size="sm"
+                                                className="ms-2"
+                                                variant="success"
+                                                onClick={() => handleShipperOrderData(order)}
+                                                title="Giao Shipper"
+                                            >
+                                                <FaHandshake/> Giao Shipper
+                                            </Button>
+                                        </>
+                                    )}
                                 </td>
                             </tr>
                         ))}
@@ -155,7 +191,7 @@ const OrderManager = () => {
                             onClick={() => handlePageChange(meta.page - 1)}
                             disabled={meta.page === 1}
                         />
-                        {Array.from({ length: meta.total_page }, (_, index) => (
+                        {Array.from({length: meta.total_page}, (_, index) => (
                             <Pagination.Item
                                 key={index + 1}
                                 active={index + 1 === meta.page}
@@ -178,6 +214,7 @@ const OrderManager = () => {
 
             <OrderDetailsModal
                 show={showOrderModal}
+                orderDetails={orderDetails}
                 onHide={() => setShowOrderModal(false)}
                 order={selectedOrder}
             />

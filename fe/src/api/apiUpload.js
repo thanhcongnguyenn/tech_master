@@ -3,8 +3,8 @@ import apiHelper from '../api/apiHelper';
 const apiUpload = {
     uploadImage: (imageFile) => {
         const formData = new FormData();
-        formData.append('file', imageFile);
-        return apiHelper.post('/uploads/image', formData, {
+        formData.append('image', imageFile);
+        return apiHelper.post('/upload/image', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data',
             },

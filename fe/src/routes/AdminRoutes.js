@@ -17,6 +17,7 @@ import ProfileManager from "../pages/admin/account/ProfileManager";
 import ServiceManager from "../pages/admin/service/ServiceManager";
 import ServiceUserManager from "../pages/admin/service/ServiceUserManager";
 import BrandManager from "../pages/admin/ecm/BrandManager";
+import VoucherManager from "../pages/admin/ecm/VoucherManager";
 
 const AdminRoutes = () => {
 
@@ -64,6 +65,7 @@ const AdminRoutes = () => {
                         <Route path="news/tags" element={<TagManager />} />
                         <Route path="news/articles" element={<ArticleManager />} />
                         <Route path="ecommerce/brand" element={<BrandManager />} />
+                        <Route path="ecommerce/voucher" element={<VoucherManager />} />
                         <Route path="ecommerce/categories" element={<CategoryManager />} />
                         <Route path="ecommerce/product-labels" element={<ProductLabelManager />} />
                         <Route path="ecommerce/product" element={<ProductManager />} />

@@ -24,7 +24,7 @@ const GuestLayout = () => {
     useEffect(() => {
         dispatch(loadUserFromLocalStorage());
     }, [dispatch]);
-
+    const bgLogo = "/images/bg-login.webp"
     const [showBooking, setShowBooking] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
 
@@ -53,7 +53,7 @@ const GuestLayout = () => {
             <Navbar bg="" variant="dark" style={{ backgroundColor: '#15397f' }}>
                 <Container>
                     <Navbar.Brand as={Link} to="/">
-                        <img src={''} alt="Logo" style={{ width: '80px' }} />
+                        <img src={bgLogo} alt="Logo" style={{ width: '80px' }} />
                     </Navbar.Brand>
                     <Nav className="me-auto">
                         <Nav.Link as={Link} to="/">Trang chủ</Nav.Link>
