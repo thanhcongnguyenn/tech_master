@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Button, Table, Pagination } from 'react-bootstrap';
+import {Container, Row, Col, Button, Table, Pagination, Dropdown} from 'react-bootstrap';
 import { useSearchParams } from "react-router-dom";
 import OrderBreadcrumbs from '../components/order/OrderBreadcrumbs';
 import apiOrderService from "../../../api/apiOrderService";
@@ -7,7 +7,6 @@ import {FaEdit, FaHandshake, FaPlusCircle, FaTrash} from "react-icons/fa";
 import OrderDetailsModal from '../components/order/OrderDetailsModal';
 import ModelConfirmDeleteData from "../../components/model-delete/ModelConfirmDeleteData";
 import NewOrderModal from '../components/order/NewOrderModal';
-
 const formatCurrency = (value) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
 };
@@ -22,6 +21,7 @@ const OrderManager = () => {
     const [orderToUpdate, setOrderToUpdate] = useState(null); // State quản lý đơn hàng để cập nhật
     const [searchParams, setSearchParams] = useSearchParams();
     const [orderDetails , setOrderDetails] = useState([]);
+    const [selectedStatus, setSelectedStatus] = useState(null);
 
     // Hàm để gọi lại API và tải danh sách đơn hàng mới nhất
     const refreshOrders = async () => {
@@ -103,7 +103,10 @@ const OrderManager = () => {
                 return 'secondary';
         }
     };
-
+    const handleStatusChange = (status) => {
+        setSelectedStatus(status);
+        setSearchParams({ ...Object.fromEntries([...searchParams]), status, page: 0 }); // Reset về trang 1
+    };
     return (
         <Container>
             <Row className="gutters mt-3">
@@ -113,11 +116,27 @@ const OrderManager = () => {
             </Row>
             <Row className="gutters">
                 <Col>
+                    {/*<div className="d-flex justify-content-between align-items-center mb-3">*/}
+                    {/*    <h2>Quản lý đơn hàng</h2>*/}
+                    {/*    <Button size="sm" variant="primary" onClick={() => setOrderToUpdate({})}>*/}
+                    {/*        Thêm mới <FaPlusCircle className="mx-1" />*/}
+                    {/*    </Button>*/}
+                    {/*</div>*/}
                     <div className="d-flex justify-content-between align-items-center mb-3">
                         <h2>Quản lý đơn hàng</h2>
-                        <Button size="sm" variant="primary" onClick={() => setOrderToUpdate({})}>
-                            Thêm mới <FaPlusCircle className="mx-1" />
-                        </Button>
+                        <Dropdown onSelect={handleStatusChange}>
+                            <Dropdown.Toggle variant="secondary" id="status-dropdown">
+                                {selectedStatus || "Lọc theo trạng thái"}
+                            </Dropdown.Toggle>
+                            <Dropdown.Menu>
+                                <Dropdown.Item eventKey="PENDING">PENDING</Dropdown.Item>
+                                <Dropdown.Item eventKey="CONFIRMED">CONFIRMED</Dropdown.Item>
+                                <Dropdown.Item eventKey="SHIPPED">SHIPPED</Dropdown.Item>
+                                <Dropdown.Item eventKey="DELIVERED">DELIVERED</Dropdown.Item>
+                                <Dropdown.Item eventKey="CANCELLED">CANCELLED</Dropdown.Item>
+                                <Dropdown.Item eventKey="">Tất cả</Dropdown.Item>
+                            </Dropdown.Menu>
+                        </Dropdown>
                     </div>
                     <Table striped bordered hover>
                         <thead>
@@ -147,12 +166,12 @@ const OrderManager = () => {
                                                 variant="danger"
                                                 onClick={() => handleDeleteData(order)}
                                                 title="Huỷ đơn"
-                                                style={{ padding: '2px', fontSize: '10px'}}
+                                                style={{padding: '2px', fontSize: '10px'}}
                                             >
                                                 <FaTrash/> Huỷ đơn
                                             </Button>
                                             <Button
-                                                style={{ padding: '2px', fontSize: '10px'}}
+                                                style={{padding: '2px', fontSize: '10px'}}
                                                 size="sm"
                                                 className="ms-2"
                                                 variant="success"
@@ -163,10 +182,10 @@ const OrderManager = () => {
                                             </Button>
                                         </>
                                     )}
-                                    {order.status === "CANCELLED" && (
+                                    {order.status === "CONFIRMED" && (
                                         <>
                                             <Button
-                                                style={{ padding: '2px', fontSize: '10px'}}
+                                                style={{padding: '2px', fontSize: '10px'}}
                                                 size="sm"
                                                 className="ms-2"
                                                 variant="success"
@@ -191,7 +210,7 @@ const OrderManager = () => {
                             onClick={() => handlePageChange(meta.page - 1)}
                             disabled={meta.page === 1}
                         />
-                        {Array.from({length: meta.total_page}, (_, index) => (
+                        {Array.from({length: meta.totalPage}, (_, index) => (
                             <Pagination.Item
                                 key={index + 1}
                                 active={index + 1 === meta.page}
@@ -202,11 +221,11 @@ const OrderManager = () => {
                         ))}
                         <Pagination.Next
                             onClick={() => handlePageChange(meta.page + 1)}
-                            disabled={meta.page === meta.total_page}
+                            disabled={meta.page === meta.totalPage}
                         />
                         <Pagination.Last
-                            onClick={() => handlePageChange(meta.total_page)}
-                            disabled={meta.page === meta.total_page}
+                            onClick={() => handlePageChange(meta.totalPage)}
+                            disabled={meta.page === meta.totalPage}
                         />
                     </Pagination>
                 </Col>

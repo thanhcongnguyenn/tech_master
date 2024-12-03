@@ -20,6 +20,7 @@ const ProductDetail = () => {
     const [selectedImage, setSelectedImage] = useState(0);
     const [relatedProducts, setRelatedProducts] = useState([]);
     const [votes, setVotes] = useState([]);
+    const [votePercentages, setVotePercentages] = useState([]);
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -139,10 +140,10 @@ const ProductDetail = () => {
                         <h1 className="product-title">{product.name}</h1>
                         <div className="d-flex align-items-center mb-2">
                             <div className="rating me-2">
-                                {renderStars(5)}
-                                <span className="rating-count ms-1">(2)</span>
+                                {renderStars(product.rating)}
+                                <span className="rating-count ms-1">({product.totalVotes})</span>
                             </div>
-                            <div className="sold-count">| Đã bán 47</div>
+                            <div className="sold-count">| Đã bán {product.totalSold = null ? 0 : product.totalSold}</div>
                         </div>
                         <div className="product-price mb-3">
                             {product.sale ? (
@@ -216,11 +217,11 @@ const ProductDetail = () => {
                         <h2 className="mb-4">Khách hàng đánh giá</h2>
                         <div className="d-flex mb-4">
                             <div className="rating-summary text-center me-5">
-                                <div className="rating-average display-4">5.0</div>
+                                <div className="rating-average display-4">{product.totalVotes}</div>
                                 <div className="rating-stars mb-2">
-                                    {renderStars(5)}
+                                    {renderStars(product.rating)}
                                 </div>
-                                <div className="rating-count text-muted">(2 đánh giá)</div>
+                                <div className="rating-count text-muted">({product.totalVotes} đánh giá)</div>
                             </div>
                             <div className="rating-bars flex-grow-1">
                                 {[5, 4, 3, 2, 1].map((stars) => (

@@ -195,19 +195,31 @@ const OrderManager = () => {
                                             >
                                                 <FaTrash /> Huỷ đơn
                                             </Button>
-                                            <Button
-                                                style={{ padding: '2px', fontSize: '10px'}}
-                                                size="sm"
-                                                className="ms-2"
-                                                variant="success"
-                                                onClick={() => handleFaHandshakeData(order)}
-                                                title="Đã nhận hàng"
-                                            >
-                                                <FaHandshake /> Đã nhận hàng
-                                            </Button>
+                                            {/*<Button*/}
+                                            {/*    style={{ padding: '2px', fontSize: '10px'}}*/}
+                                            {/*    size="sm"*/}
+                                            {/*    className="ms-2"*/}
+                                            {/*    variant="success"*/}
+                                            {/*    onClick={() => handleFaHandshakeData(order)}*/}
+                                            {/*    title="Đã nhận hàng"*/}
+                                            {/*>*/}
+                                            {/*    <FaHandshake /> Đã nhận hàng*/}
+                                            {/*</Button>*/}
                                         </>
                                     )}
-                                    {order.totalAmount > order.amountPaid && order?.paymentMethod == "PAY_LATER" && (
+                                    {order.status === "SHIPPED" && (
+                                        <Button
+                                            style={{ padding: '2px', fontSize: '10px'}}
+                                            size="sm"
+                                            className="ms-2"
+                                            variant="success"
+                                            onClick={() => handleFaHandshakeData(order)}
+                                            title="Đã nhận hàng"
+                                        >
+                                            <FaHandshake /> Đã nhận hàng
+                                        </Button>
+                                    )}
+                                    {order.totalAmount > order.amountPaid && order.status === "DELIVERED" && order?.paymentMethod == "PAY_LATER" && (
                                         <Button
                                             style={{ padding: '2px', fontSize: '10px'}}
                                             size="sm"
